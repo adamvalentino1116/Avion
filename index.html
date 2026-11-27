@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#090e18">
+<meta name="apple-mobile-web-app-title" content="AVION">
+<title>AVION | Intelligence System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090e18;color:#e5edf7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px 18px 110px}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{letter-spacing:8px;font-size:28px;margin:10px 0}
+h2{font-size:22px}
+h3{margin:8px 0}
+small,p{color:#94a3b8;line-height:1.5}
+.status{color:#65dbaa;font-size:11px}
+.card{background:linear-gradient(145deg,#162337,#101827);border:1px solid #293c53;border-radius:20px;padding:20px;margin:16px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.agent{background:#111c2b;border:1px solid #26374c;border-radius:16px;padding:16px;color:#e5edf7;text-align:left;cursor:pointer}
+.agent span{color:#78baff;font-size:24px}
+.agent small{display:block}
+input,textarea{width:100%;background:#090e18;color:white;border:1px solid #344860;border-radius:12px;padding:13px;font-size:16px}
+button{font-family:inherit;cursor:pointer}
+.action{background:#78baff;color:#09111e;border:0;border-radius:12px;padding:12px;font-weight:bold;margin-top:10px;width:100%}
+nav{position:fixed;bottom:0;left:0;right:0;background:#101827;border-top:1px solid #293c53;display:flex;justify-content:space-around;padding:18px 5px calc(18px + env(safe-area-inset-bottom))}
+nav button{background:none;border:none;color:#94a3b8;font-size:12px}
+nav button.active{color:#78baff}
+.view{display:none}
+.view.active{display:block}
+#response{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+<h1>AVION</h1>
+<span class="status">● PROTOTYPE</span>
+</header>
+<small>PERSONAL INTELLIGENCE SYSTEM / V0.1</small>
+
+<section id="home" class="view active">
+<div class="card">
+<small>CHIEF INTELLIGENCE & STRATEGY</small>
+<h2>◈ ARES</h2>
+<p>Welcome to AVION. Your mission begins here.</p>
+<button class="action" onclick="show('ares')">Command ARES</button>
+</div>
+<h3>Intelligence Network</h3>
+<div class="grid" id="agents"></div>
+<div class="card">
+<h3>Primary Mission</h3>
+<p>Build sustainable wealth, discover opportunities, expand knowledge and improve every day.</p>
+</div>
+</section>
+
+<section id="ares" class="view">
+<div class="card">
+<h2>◈ ARES</h2>
+<p>Command Center</p>
+<small>Demo mode — AI not connected</small>
+<p id="response">Enter a mission or question below.</p>
+<input id="command" placeholder="Command ARES...">
+<button class="action" onclick="command()">Submit Command</button>
+</div>
+</section>
+
+<section id="network" class="view">
+<h2>Agent Network</h2>
+<div id="profiles"></div>
+</section>
+
+<section id="reports" class="view">
+<h2>Intelligence Reports</h2>
+<div class="card">
+<h3>Development Report</h3>
+<p>AVION V0.1 interface initialized.</p>
+<p>AI integration: Pending</p>
+<p>Autonomous research: Pending</p>
+<p>Agent collaboration: Pending</p>
+</div>
+<div class="card">
+<h3>Mission Log</h3>
+<div id="log"></div>
+</div>
+</section>
+
+<section id="settings" class="view">
+<h2>System Settings</h2>
+<div class="card">
+<h3>My Goals</h3>
+<textarea id="goals" rows="5" placeholder="Enter your personal goals"></textarea>
+<button class="action" onclick="saveGoals()">Save Goals</button>
+<p id="saved"></p>
+</div>
+<div class="card">
+<h3>System Information</h3>
+<p>Version: 0.1</p>
+<p>Mode: Local prototype</p>
+<p>Data: Stored on this device</p>
+<p>AI connection: Not configured</p>
+</div>
+</section>
+
+<nav>
+<button onclick="show('home')" class="active" data-page="home">⌂<br>Home</button>
+<button onclick="show('network')" data-page="network">◎<br>Agents</button>
+<button onclick="show('ares')" data-page="ares">◈<br>ARES</button>
+<button onclick="show('reports')" data-page="reports">▤<br>Reports</button>
+<button onclick="show('settings')" data-page="settings">⚙<br>Settings</button>
+</nav>
+
+<script>
+const agents=[
+['↗','WEALTH','Financial intelligence','Research sustainable wealth and financial strategies.'],
+['◎','OPPORTUNITIES','Business discovery','Explore entrepreneurship and emerging markets.'],
+['◇','SCHOLAR','Academic development','Support education, studying and skill development.'],
+['♡','SOLACE','Personal wellness','Support reflection and healthy routines.'],
+['⬡','SYNAPSE','Shared intelligence','Organize knowledge across the agent network.'],
+['▤','REPORTS','System analysis','Track progress and evaluate agent performance.']
+];
+
+document.getElementById('agents').innerHTML=agents.map(a=>`<button class="agent" onclick="show('network')"><span>${a[0]}</span><h3>${a[1]}</h3><small>${a[2]}</small></button>`).join('');
+
+document.getElementById('profiles').innerHTML=agents.map(a=>`<div class="card"><h3>${a[0]} ${a[1]}</h3><p>${a[3]}</p><small>Status: Awaiting AI integration</small></div>`).join('');
+
+function show(id){
+document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+window.scrollTo(0,0);
+if(id==='reports')renderLog();
+}
+
+function command(){
+const input=document.getElementById('command');
+const value=input.value.trim();
+if(!value)return;
+const logs=JSON.parse(localStorage.getItem('avion-log')||'[]');
+logs.unshift({text:value,date:new Date().toLocaleString()});
+localStorage.setItem('avion-log',JSON.stringify(logs));
+document.getElementById('response').textContent='Mission recorded locally. ARES is currently in demo mode. Real AI processing will be available after integration.';
+input.value='';
+}
+
+function renderLog(){
+const el=document.getElementById('log');
+el.replaceChildren();
+const logs=JSON.parse(localStorage.getItem('avion-log')||'[]');
+if(!logs.length)el.textContent='No missions recorded.';
+logs.forEach(item=>{
+const p=document.createElement('p');
+p.textContent=item.date+' — '+item.text;
+el.appendChild(p);
+});
+}
+
+function saveGoals(){
+localStorage.setItem('avion-goals',document.getElementById('goals').value);
+document.getElementById('saved').textContent='Goals saved on this device.';
+}
+document.getElementById('goals').value=localStorage.getItem('avion-goals')||'';
+</script>
+</body>
+</html>
